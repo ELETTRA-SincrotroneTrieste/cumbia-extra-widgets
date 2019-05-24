@@ -63,13 +63,8 @@ void TwoDRWSurface::drawRead(QPainter *pa, QPaintEvent *p)
     pe.setColor(QColor(Qt::green));
     pa->setPen(pe);
     const double w = d->surface.width(), h = d->surface.height(), x0 = d->surface.x(), y0 = d->surface.y();
-    int xp = -1, yp = -1;
-    if(d->x >= d->xm && d->x <= d->xM && d->xm <= d->xM) {
-        xp = qRound(x0 + d->x * w  / (d->xM - d->xm));
-    }
-    if(d->y >= d->ym && d->y <= d->yM && d->ym <= d->yM) {
-        yp = qRound(y0 + d->y * h  / (d->yM - d->ym));
-    }
+    const QPointF xyp = mapFromValue(QPointF(d->x, d->y));
+    const double &xp = xyp.x(), &yp = xyp.y();
 
     if(xp >= 0 && yp >= 0) {
         pa->drawLine(xp, yp - d->read_indicator_size/2, xp,  yp + d->read_indicator_size/2);
@@ -138,10 +133,10 @@ QPointF TwoDRWSurface::mapFromValue(const QPointF &xy) const
     const double w = d->surface.width(), h = d->surface.height(), x0 = d->surface.x(), y0 = d->surface.y();
     double xp = -1, yp = -1;
     if(xy.x() >= d->xm && xy.x() <= d->xM && d->xm <= d->xM) {
-        xp = x0 + xy.x() * w  / (d->xM - d->xm);
+        xp = x0 + (xy.x() - d->xm) * w  / (d->xM - d->xm);
     }
     if(xy.y() >= d->ym && xy.y() <= d->yM && d->ym <= d->yM) {
-        yp = h + y0 - xy.y() * h  / (d->yM - d->ym);
+        yp = h + y0 - (xy.y() - d->ym) * h  / (d->yM - d->ym);
     }
     return QPointF(xp, yp);
 }

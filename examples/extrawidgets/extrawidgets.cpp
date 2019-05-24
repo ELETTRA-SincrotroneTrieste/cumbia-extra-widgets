@@ -6,6 +6,16 @@
 #include <QDoubleSpinBox>
 #include <QLineEdit>
 #include <QGridLayout>
+#include <QMessageBox>
+
+#include <quwatcher.h>
+#include <quwriter.h>
+#include <cumbiatango.h>
+#include <cuthreadfactoryimpl.h>
+#include <qthreadseventbridgefactory.h>
+#include <cutangoactionfactories.h>
+#include <cutcontrolsreader.h>
+#include <cutcontrolswriter.h>
 
 ExtraWidgets::ExtraWidgets(QWidget *parent) :
     QWidget(parent),
@@ -79,6 +89,37 @@ ExtraWidgets::ExtraWidgets(QWidget *parent) :
 
     foreach(QLabel *l, findChildren<QLabel *>())
         l->setAlignment(Qt::AlignRight|Qt::AlignVCenter);
+
+    if(qApp->arguments().size() > 2) {
+        CumbiaTango *cu_t = new CumbiaTango(new CuThreadFactoryImpl(), new QThreadsEventBridgeFactory());
+
+        CuTReaderFactory cu_tango_r_fac;
+        CuTWriterFactory cu_tango_w_fac;
+
+        QuWatcher *x_reader = new QuWatcher(rws, cu_t, cu_tango_r_fac);
+        QuWatcher *y_reader = new QuWatcher(rws, cu_t, cu_tango_r_fac);
+        x_reader->attach(rws, SLOT(setX(double)));
+        y_reader->attach(rws, SLOT(setY(double)));
+
+        QuWriter *xwr = new QuWriter(rws, cu_t, cu_tango_w_fac);
+        QuWriter *ywr = new QuWriter(rws, cu_t, cu_tango_w_fac);
+        xwr->attach(rws, SIGNAL(x_targetMoveFinished(double)), SLOT(setX_W(double)));
+        ywr->attach(rws, SIGNAL(y_targetMoveFinished(double)), SLOT(setY_W(double)));
+        xwr->setAutoConfSlot(Qumbiaizer::Min, SLOT(setXMin(double)));
+        xwr->setAutoConfSlot(Qumbiaizer::Max, SLOT(setXMax(double)));
+        ywr->setAutoConfSlot(Qumbiaizer::Min, SLOT(setYMin(double)));
+        ywr->setAutoConfSlot(Qumbiaizer::Max, SLOT(setYMax(double)));
+
+        x_reader->setSource(qApp->arguments().at(1));
+        y_reader->setSource(qApp->arguments().at(2));
+        xwr->setTarget(x_reader->source());
+        ywr->setTarget(y_reader->source());
+
+//        rws->setReadOnly(true);
+    }
+    else{
+        QMessageBox::information(this, "Usage", QString("%1 x_source y_source").arg(qApp->arguments().first()));
+    }
 }
 
 ExtraWidgets::~ExtraWidgets()

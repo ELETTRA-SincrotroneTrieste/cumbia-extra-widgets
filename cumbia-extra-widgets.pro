@@ -70,8 +70,8 @@ unix {
 # generate pkg config file
 CONFIG += create_pc create_prl no_install_prl
 
-    QMAKE_PKGCONFIG_NAME = cumbia-qtcontrols
-    QMAKE_PKGCONFIG_DESCRIPTION = Qt controls widget for graphical interfaces over cumbia
+    QMAKE_PKGCONFIG_NAME = $${cumbia_extra_widgets_LIB}
+    QMAKE_PKGCONFIG_DESCRIPTION = extra controls widgets for graphical interfaces over cumbia
     QMAKE_PKGCONFIG_PREFIX = $${INSTALL_ROOT}
     QMAKE_PKGCONFIG_LIBDIR = $${target.path}
     QMAKE_PKGCONFIG_INCDIR = $${inc.path}
