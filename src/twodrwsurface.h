@@ -98,6 +98,8 @@ protected:
 
     void mouseReleaseEvent(QMouseEvent *e);
 
+    void resizeEvent(QResizeEvent *re);
+
 private:
     TwoDRWSurfacePrivate *d;
 

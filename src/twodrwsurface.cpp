@@ -125,7 +125,7 @@ QPointF TwoDRWSurface::mapFromPos(const QPointF &pos) const
     const double w = d->surface.width(), h = d->surface.height(), x0 = d->surface.left(), y0 = d->surface.top();
     double px = (pos.x() - x0) * (d->xM - d->xm) / w;
     double py = y0 + (h - pos.y() + y0) * (d->yM - d->ym) / h;
-    return QPointF(px, py);
+    return QPointF(d->xm + px, d->ym + py);
 }
 
 QPointF TwoDRWSurface::mapFromValue(const QPointF &xy) const
@@ -411,6 +411,12 @@ void TwoDRWSurface::mouseReleaseEvent(QMouseEvent *e)
     const QRectF& r = targetBoundingRect();
     if(r.contains(e->pos()))
         setCursor(QCursor(Qt::OpenHandCursor));
+}
+
+void TwoDRWSurface::resizeEvent(QResizeEvent *re)
+{
+    QWidget::resizeEvent(re);
+    updateSurface();
 }
 
 int TwoDRWSurface::m_calc_scale_space(Scale sc, const QFontMetrics *fm) const
